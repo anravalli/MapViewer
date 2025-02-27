@@ -42,6 +42,8 @@ else()
         add_executable(MapView
             ${PROJECT_SOURCES}
             mapviewer.h mapviewer.cpp
+            ego.h ego.cpp
+            map.h map.cpp
         )
     endif()
 endif()

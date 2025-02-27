@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "map.h"
+#include "ego.h"
 
 class MapViewer;
 
@@ -17,10 +19,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void selectMap();
+
 private:
     Ui::MainWindow *ui;
-    MapViewer *map_viewer;
-    QString map_file;
+    MapViewer *the_map_viewer;
+    Map *the_map;
+    Ego *the_ego;
+    // QString map_file;
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
