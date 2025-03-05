@@ -13,11 +13,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     the_map = new Map();
     the_ego = new Ego();
+    the_other = new Ego();
     the_map_viewer = new MapViewer(static_cast<QWidget *>(old_map->parent()),
-                                   the_map, the_ego);
+                                   the_map, the_ego, the_other);
     ui->map_area = the_map_viewer;
 
     connect(ui->actionLoad_Map, SIGNAL(triggered(bool)), this, SLOT(selectMap()));
+    connect(the_ego, SIGNAL(updated(QPointF)), this, SLOT(egoUpdated(QPointF)));
+
+    connect(the_ego, SIGNAL(updated(QPointF)), the_map, SLOT(matchEgoToMap(QPointF)));
+    connect(the_other, SIGNAL(updated(QPointF)), the_map, SLOT(matchOtherToMap(QPointF)));
+
     delete old_map;
 }
 
@@ -47,5 +53,13 @@ void MainWindow::selectMap()
     } else {
         qDebug() << "No file selected.";
     }
+}
+
+void MainWindow::egoUpdated(QPointF p)
+{
+    auto status_bar = ui->statusbar;
+    QString msg = "EGO position: (";
+    msg += QString::number(p.x()) + "," + QString::number(p.y()) + ")";
+    status_bar->showMessage(msg);
 }
 

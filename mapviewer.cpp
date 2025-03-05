@@ -6,13 +6,12 @@
 
 #include <QDebug>
 
-MapViewer::MapViewer(QWidget *_parent, Map *map, Ego *ego):
-    QWidget(_parent), m_map(map), m_ego(ego)
+MapViewer::MapViewer(QWidget *_parent, Map *map, Ego *ego, Ego* other):
+    QWidget(_parent), m_map(map), m_ego(ego), m_other(other)
 {
     std::cout << "MapViewer created" << std::endl;
     this->setParent(_parent);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     m_center = this->rect().center();
     std::cout << "center is at:" << m_center.x() << ", " << m_center.y() << std::endl;
 }
@@ -79,8 +78,7 @@ void MapViewer::paintEvent(QPaintEvent *event)
     painter.translate(this->rect().center());
     // painter.translate(m_center - this->rect().center());
     painter.translate(m_delta);
-    // painter.setFont(QFont("Arial", 20));
-    // painter.drawText(QPoint(100, 100), "Hello, Canvas!");
+
     enum Qt::GlobalColor color_array[4] = {Qt::white, Qt::yellow, Qt::darkBlue, Qt::red};
 
     QPointF ps;
@@ -110,10 +108,20 @@ void MapViewer::paintEvent(QPaintEvent *event)
     painter.setBrush(Qt::green);
     //QPointF p((m_my_pos*m_zoom-m_center));
     QPointF p = toPointInScreen(m_ego->pos());
-    std::cout << "paint p x: " << p.x() << ", y: " << p.y() << std::endl;
     QPointF pp = p-m_center;
-    std::cout << "paint pp: x" << pp.x() << ", y:" << pp.y() << std::endl;
     painter.drawEllipse(pp, 5, 5);
+    painter.setFont(QFont("Arial", 20));
+    painter.drawText(QPoint(pp.x(), pp.y()-5), m_ego->map_info().street_name);
+    // std::cout << "paint p x: " << p.x() << ", y: " << p.y() << std::endl;
+    // std::cout << "paint pp: x" << pp.x() << ", y:" << pp.y() << std::endl;
+
+    painter.setPen(Qt::darkRed);
+    painter.setBrush(Qt::darkRed);
+    p = toPointInScreen(m_other->pos());
+    pp = p-m_center;
+    painter.drawEllipse(pp, 5, 5);
+    painter.setFont(QFont("Arial", 20));
+    painter.drawText(QPoint(pp.x(), pp.y()-5), m_ego->map_info().street_name);
 
 }
 
@@ -137,7 +145,7 @@ void MapViewer::mouseReleaseEvent(QMouseEvent *event)
     QPointF sp;
     switch(event->button()){
     case Qt::LeftButton:
-        std::cout << "Event x: " << event->x() << ", y: " << event->y() << std::endl;
+        std::cout << "L - Event x: " << event->x() << ", y: " << event->y() << std::endl;
         sp = (event->pos()-m_delta);
         std::cout << "event sp x: " << sp.x() << ", y: " << sp.y() << std::endl;
         m_ego->update(toPointInMap(sp));
@@ -147,6 +155,14 @@ void MapViewer::mouseReleaseEvent(QMouseEvent *event)
     case Qt::MiddleButton:
         qApp->restoreOverrideCursor();
         m_pan_en = false;
+        update();
+        break;
+    case Qt::RightButton:
+        std::cout << "R - Event x: " << event->x() << ", y: " << event->y() << std::endl;
+        sp = (event->pos()-m_delta);
+        std::cout << "event sp x: " << sp.x() << ", y: " << sp.y() << std::endl;
+        m_other->update(toPointInMap(sp));
+
         update();
         break;
     default:

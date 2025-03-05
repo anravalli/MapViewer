@@ -16,7 +16,7 @@ class MapViewer: public QWidget
 {
     Q_OBJECT
 public:
-    MapViewer(QWidget *_parent, Map *map, Ego *ego);
+    MapViewer(QWidget *_parent, Map *map, Ego *ego, Ego *other);
     void reset();
 
 protected:
@@ -44,6 +44,7 @@ private:
 
     Map *m_map;
     Ego *m_ego;
+    Ego *m_other;
 };
 
 #endif // MAPVIEWER_H

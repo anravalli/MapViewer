@@ -21,12 +21,14 @@ public:
 
 public slots:
     void selectMap();
+    void egoUpdated(QPointF p);
 
 private:
     Ui::MainWindow *ui;
     MapViewer *the_map_viewer;
     Map *the_map;
     Ego *the_ego;
+    Ego *the_other;
     // QString map_file;
 
 protected:

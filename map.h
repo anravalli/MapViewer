@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QRectF>
 #include <vector>
+#include <QFile>
+
+constexpr int street_to_side_line = 3; //meters
 
 struct Street {
     std::string name;
@@ -14,13 +17,23 @@ struct Street {
     std::vector<QPointF> points;
 };
 
+struct SegmentInfo {
+    QPointF relative_position;
+    double lenght;
+    QString street_name;
+    int street_idx;
+    int start_idx;
+    QPointF start;
+    QPointF end;
+};
+
 class Map: public QObject
 {
     Q_OBJECT
 public:
     Map();
     void loadMap(QString osmFile);
-    void printStreets();
+    void printStreets(bool verbose = false);
 
     std::vector<Street> streets() const;
 
@@ -33,9 +46,20 @@ public:
 
     QRectF rect() const;
 
+public slots:
+    void matchEgoToMap(QPointF p);
+    void matchOtherToMap(QPointF p);
+
+signals:
+    void matchedEgo(SegmentInfo segment);
+    void matchedOther(SegmentInfo segment);
+
 private:
+    bool matchToMap(QPointF p, SegmentInfo &segment);
     void extractStreets(const QString &osmFilePath);
+    void extractBounds(const QString &osmFilePath);
     bool isStreet(std::string type);
+    bool mapToSegment(const QPointF& point, SegmentInfo &segment);
 
     QString m_map_file = "";
 
