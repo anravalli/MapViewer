@@ -17,61 +17,34 @@
    <property name="palette">
     <palette>
      <active>
-      <colorrole role="Base">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>106</red>
-         <green>106</green>
-         <blue>106</blue>
-        </color>
-       </brush>
-      </colorrole>
       <colorrole role="Window">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>235</red>
-         <green>124</green>
-         <blue>97</blue>
+         <red>173</red>
+         <green>140</green>
+         <blue>100</blue>
         </color>
        </brush>
       </colorrole>
      </active>
      <inactive>
-      <colorrole role="Base">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>106</red>
-         <green>106</green>
-         <blue>106</blue>
-        </color>
-       </brush>
-      </colorrole>
       <colorrole role="Window">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>235</red>
-         <green>124</green>
-         <blue>97</blue>
+         <red>173</red>
+         <green>140</green>
+         <blue>100</blue>
         </color>
        </brush>
       </colorrole>
      </inactive>
      <disabled>
-      <colorrole role="Base">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>235</red>
-         <green>124</green>
-         <blue>97</blue>
-        </color>
-       </brush>
-      </colorrole>
       <colorrole role="Window">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>235</red>
-         <green>124</green>
-         <blue>97</blue>
+         <red>173</red>
+         <green>140</green>
+         <blue>100</blue>
         </color>
        </brush>
       </colorrole>
@@ -93,8 +66,26 @@
      <string>File</string>
     </property>
     <addaction name="actionLoad_Map"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionReset"/>
+    <addaction name="actionCenter"/>
+    <addaction name="actionBackground_Color"/>
+    <addaction name="actionStreets_Thickness"/>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionMapViewer"/>
    </widget>
    <addaction name="file_menu"/>
+   <addaction name="menuView"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoad_Map">
@@ -103,6 +94,48 @@
    </property>
    <property name="text">
     <string>Load Map</string>
+   </property>
+  </action>
+  <action name="actionReset">
+   <property name="text">
+    <string>Reset</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="reset the view">Reset</string>
+   </property>
+  </action>
+  <action name="actionCenter">
+   <property name="text">
+    <string>Center</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="move to map center">Center</string>
+   </property>
+  </action>
+  <action name="actionBackground_Color">
+   <property name="text">
+    <string>Background Color</string>
+   </property>
+  </action>
+  <action name="actionStreets_Thickness">
+   <property name="text">
+    <string>Streets Thickness</string>
+   </property>
+  </action>
+  <action name="actionMapViewer">
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
  </widget>

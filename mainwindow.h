@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
 #include "map.h"
 #include "ego.h"
 
@@ -21,7 +22,11 @@ public:
 
 public slots:
     void selectMap();
+    void resetView();
+    void centerView();
+    void changeBackGroundColor();
     void egoUpdated(QPointF p);
+    void otherUpdated(QPointF p);
 
 private:
     Ui::MainWindow *ui;
@@ -29,6 +34,9 @@ private:
     Map *the_map;
     Ego *the_ego;
     Ego *the_other;
+    QLabel *the_ego_info;
+    QLabel the_other_info;
+    QLabel the_risk_info;
     // QString map_file;
 
 protected:

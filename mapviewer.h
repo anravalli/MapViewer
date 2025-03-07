@@ -18,6 +18,7 @@ class MapViewer: public QWidget
 public:
     MapViewer(QWidget *_parent, Map *map, Ego *ego, Ego *other);
     void reset();
+    void centerView();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -31,6 +32,7 @@ private:
     QPointF toPointInScreen(QPointF coord);
     QPointF toPointInMap(QPointF sp);
     void updateScale(QSize new_size);
+    void centerTo(const QPointF p);
 
     bool m_pan_en = false;
 

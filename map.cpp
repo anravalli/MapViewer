@@ -275,13 +275,21 @@ bool Map::isStreet(std::string type)
     return is_street;
 }
 
+Geodesy::Position pointToPosition (const QPointF &point)
+{
+    Geodesy::Position pos;
+    pos.latitude = Geodesy::degToRad(point.y());
+    pos.longitude = Geodesy::degToRad(point.x());
+    return pos;
+}
+
 bool Map::mapToSegment(const QPointF &point, SegmentInfo &segment)
 {
     bool matched = false;
     //Geodesy::Position has lat and lon swapped
-    Geodesy::Position g_start = {segment.start.y(), segment.start.x()};
-    Geodesy::Position g_end = {segment.end.y(), segment.end.x()};
-    Geodesy::Position g_p = {point.y(), point.x()};
+    Geodesy::Position g_start = pointToPosition(segment.start);
+    Geodesy::Position g_end = pointToPosition(segment.end); //{segment.end.y(), segment.end.x()};
+    Geodesy::Position g_p = pointToPosition(point);
     double segment_bearing = Geodesy::initialBearing(g_start, g_end);
     //double segment_direction = std::atan2(dy,dx);
     Geodesy::Point relative_p = Geodesy::relativePosition(g_start, segment_bearing, g_p);
@@ -292,14 +300,13 @@ bool Map::mapToSegment(const QPointF &point, SegmentInfo &segment)
         matched = true;
         segment.lenght = relative_end.x;
         segment.relative_position = QPointF(relative_p.x, relative_p.y);
+        std::cout << "matched: " << matched << std::endl;
     }
-    std::cout << "matched: " << matched << std::endl;
     return matched;
 }
 
 bool Map::matchToMap(QPointF p, SegmentInfo &segment)
 {
-
     // bool matched = false;
     for(int i=0; i < m_streets.size(); i++)
     {
@@ -308,13 +315,13 @@ bool Map::matchToMap(QPointF p, SegmentInfo &segment)
         for(int j=0; j<street.points.size()-1; j++)
         {
             segment.start = street.points[j];
-            segment.end = street.points[i+j];
+            segment.end = street.points[j+1];
             // matched = ;
             if(mapToSegment(p, segment)){
                 segment.start_idx = j;
                 segment.street_idx = i;
                 segment.street_name = street.name.c_str();
-
+                std::cout << "street #" << segment.street_idx << ": " << segment.street_name.toStdString() << std::endl;
                 return true; //assume only one match is possible
             }
         }

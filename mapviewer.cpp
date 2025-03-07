@@ -26,6 +26,22 @@ void MapViewer::reset()
     update();
 }
 
+void MapViewer::centerView()
+{
+    centerTo(toPointInScreen(m_map->rect().center()));
+}
+
+void MapViewer::centerTo(const QPointF p)
+{
+    std::cout << "m_center: " << m_center.x() << ", " << m_center.y() << std::endl;
+    std::cout << "p: " << p.x() << ", " << p.y() << std::endl;
+    m_delta = m_center-p;
+    std::cout << "New m_delta: " << m_delta.x() << ", " << m_delta.y() << std::endl;
+    update();
+}
+
+
+
 QPointF MapViewer::toPointInScreen(QPointF coord)
 {
     QPointF screen_point;
@@ -45,16 +61,7 @@ QPointF MapViewer::toPointInMap(QPointF sp)
     QPointF map_point;
     QPointF min = m_map->top_left();
 
-    // x = (lon-min.x())*m_w_scale*m_zoom --> x/(m_w_scale*m_zoom) = lon-min.x()
-    //      --> lon = min.x() + x/(m_w_scale*m_zoom)
     double lon = min.x() + sp.x()/(m_w_scale*m_zoom);
-    // y = ( m_map->height() - ( lat - min.y() ) )*m_h_scale*m_zoom;
-    // y/(m_h_scale*m_zoom) = m_map->height() - ( lat - min.y() )
-    // y/(m_h_scale*m_zoom) - m_map->height() = - ( lat - min.y() )
-    // lat - min.y() = - (y/(m_h_scale*m_zoom) - m_map->height()) = -y/(m_h_scale*m_zoom) + m_map->height()
-    // lat - min.y() = m_map->height() - y/(m_h_scale*m_zoom)
-    //      --> lat = m_map->height() + min.y() - y/(m_h_scale*m_zoom)
-    //      --> lat = m_map->height() - (y/(m_h_scale*m_zoom) - min.y())
     double lat = m_map->height() - (sp.y()/(m_h_scale*m_zoom) - min.y());
 
     map_point.setX(lon);
@@ -75,7 +82,7 @@ void MapViewer::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     // std::cout << "center is at:" << m_center.x() << ", " << m_center.y() << std::endl;
-    painter.translate(this->rect().center());
+    painter.translate(m_center);
     // painter.translate(m_center - this->rect().center());
     painter.translate(m_delta);
 
@@ -110,7 +117,7 @@ void MapViewer::paintEvent(QPaintEvent *event)
     QPointF p = toPointInScreen(m_ego->pos());
     QPointF pp = p-m_center;
     painter.drawEllipse(pp, 5, 5);
-    painter.setFont(QFont("Arial", 20));
+    painter.setFont(QFont("Arial", 14));
     painter.drawText(QPoint(pp.x(), pp.y()-5), m_ego->map_info().street_name);
     // std::cout << "paint p x: " << p.x() << ", y: " << p.y() << std::endl;
     // std::cout << "paint pp: x" << pp.x() << ", y:" << pp.y() << std::endl;
@@ -120,8 +127,8 @@ void MapViewer::paintEvent(QPaintEvent *event)
     p = toPointInScreen(m_other->pos());
     pp = p-m_center;
     painter.drawEllipse(pp, 5, 5);
-    painter.setFont(QFont("Arial", 20));
-    painter.drawText(QPoint(pp.x(), pp.y()-5), m_ego->map_info().street_name);
+    painter.setFont(QFont("Arial", 14));
+    painter.drawText(QPoint(pp.x(), pp.y()-5), m_other->map_info().street_name);
 
 }
 
@@ -210,12 +217,21 @@ void MapViewer::wheelEvent(QWheelEvent *event)
             m_zoom = m_zoom / 2;
         }
 
-        //m_delta = this->rect().center()-event->position();
+        //m_delta += (event->position()-this->rect().center())*m_zoom;
         // m_center = event->position();
+        QPointF tmp = event->position();
+        // std::cout << "position: " << tmp.x() << ", " << tmp.y() << std::endl;
+        // tmp = toPointInMap(tmp);
+        // std::cout << "position to map: "<< tmp.x() << ", " << tmp.y() << std::endl;
+        // tmp = toPointInScreen(tmp);
+        // std::cout << "position to screen: "<< tmp.x() << ", " << tmp.y() << std::endl;
+        tmp = tmp*m_zoom;
+        std::cout << "new center: "<< tmp.x() << ", " << tmp.y() << std::endl;
+        centerTo(tmp);
         event->accept();
         qDebug() << "new zoom factor: " << m_zoom;
         // qDebug() << "new center is: " << m_center;
 
-        update();
+        // update();
     }
 }
