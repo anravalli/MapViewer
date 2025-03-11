@@ -267,6 +267,9 @@ bool Map::isStreet(std::string type)
         if((type == "residential") or
                 (type == "primary") or
                 (type == "secondary") or
+                (type == "tertiary") or
+                (type == "tertiary_link") or
+                (type == "unclassified") or
                 (type == "service") or
                 (type == "track") or
                 (type == "raceway"))

@@ -1,5 +1,6 @@
 #include "ego.h"
 #include <iostream>
+#include <iomanip>
 
 Ego::Ego()
 {
@@ -8,7 +9,7 @@ Ego::Ego()
 
 void Ego::update(QPointF pos)
 {
-    std::cout << "New ego x: " << pos.x() << ", y: " << pos.y() << std::endl;
+    std::cout << "New position (lat,lon): " << std::fixed << std::setprecision(8) << pos.y() << "," << pos.x() << std::endl;
     m_pos = pos;
     m_map_info.street_name = "";
     emit(updated(pos));
