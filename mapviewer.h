@@ -20,6 +20,10 @@ public:
     void reset();
     void centerView();
 
+    void setMarker_en(bool newMarker_en);
+
+    void setMarker_label_en(bool newMarker_label_en);
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -34,7 +38,21 @@ private:
     void updateScale(QSize new_size);
     void centerTo(const QPointF p);
 
+    enum MarkerType {
+        first,
+        second,
+        lastBut,
+        last,
+        other
+    };
+
+    void paintMarker(QPainter &painter, QPointF pos,
+                      MarkerType type, QColor pen, QColor brush);
+
     bool m_pan_en = false;
+
+    bool m_marker_en = true;
+    bool m_marker_label_en = false;
 
     double m_w_scale = 0;
     double m_h_scale = 0;

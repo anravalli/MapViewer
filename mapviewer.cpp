@@ -40,6 +40,62 @@ void MapViewer::centerTo(const QPointF p)
     update();
 }
 
+void MapViewer::paintMarker(QPainter &painter, QPointF pos,
+                             MarkerType type, QColor pen, QColor brush)
+{
+    if(m_marker_en){
+        painter.setPen(pen);
+        painter.setBrush(brush);
+        switch(type){
+        case first:
+        case second:
+            painter.drawRect(QRectF(pos.x()-5,pos.y()-5,10,10));
+            break;
+        case lastBut:
+            // painter.drawEllipse(pos, 5, 5);
+            // break;
+        case last:
+        {
+            QPointF tri[3] = {
+                QPointF(pos.x(), pos.y()+5),
+                QPointF(pos.x()+5, pos.y()-5),
+                QPointF(pos.x()-5, pos.y()-5)
+            };
+            painter.drawPolygon(tri, 3);
+        }
+            break;
+        default:
+            painter.drawEllipse(pos, 3, 3);
+            break;
+        }
+    }
+    if(m_marker_label_en){
+        painter.setPen(pen);
+        painter.setBrush(brush);
+        switch(type){
+        case first:
+            painter.drawText(QPointF(pos.x(),pos.y()-15), "S");
+            break;
+        case last:
+            painter.drawText(QPointF(pos.x(),pos.y()-10), "E");
+            break;
+        }
+    }
+    return;
+}
+
+void MapViewer::setMarker_label_en(bool newMarker_label_en)
+{
+    m_marker_label_en = newMarker_label_en;
+    update();
+}
+
+void MapViewer::setMarker_en(bool newMarker_en)
+{
+    m_marker_en = newMarker_en;
+    update();
+}
+
 
 
 QPointF MapViewer::toPointInScreen(QPointF coord)
@@ -86,27 +142,59 @@ void MapViewer::paintEvent(QPaintEvent *event)
     // painter.translate(m_center - this->rect().center());
     painter.translate(m_delta);
 
-    enum Qt::GlobalColor color_array[4] = {Qt::white, Qt::yellow, Qt::darkBlue, Qt::red};
+    enum Qt::GlobalColor color_array[13] = {Qt::white,
+                                           Qt::red,
+                                           Qt::green,
+                                           Qt::blue,
+                                           Qt::cyan,
+                                           Qt::magenta,
+                                           Qt::yellow,
+                                           Qt::darkRed,
+                                           Qt::darkGreen,
+                                           Qt::darkBlue,
+                                           Qt::darkCyan,
+                                           Qt::darkMagenta,
+                                           Qt::darkYellow};
 
     QPointF ps;
     int i = 0;
+
+    painter.setFont(QFont("Arial", 14));
+
     for(auto street: m_map->streets()){
         QVector<QPointF> street_pline;
-        //style for points
-        painter.setPen(Qt::blue);
-        painter.setBrush(Qt::white);
-        for(auto p: street.points ){
+
+        for(int j=0; j<street.points.size(); j++ ){
+            auto p = street.points[j];
             ps = toPointInScreen(p)-m_center;
-            painter.drawEllipse(ps, 2, 2);
             street_pline.append(ps);
+            if(j==0){
+                paintMarker(painter, ps, MarkerType::first,
+                             color_array[i], color_array[i]);
+            }
+            if(j==1){
+                paintMarker(painter, ps, MarkerType::second,
+                             Qt::green, color_array[i]);
+            }
+            else if(j==street.points.size()-2){
+                paintMarker(painter, ps, MarkerType::lastBut,
+                             Qt::green, color_array[i]);
+            }
+            else if(j==street.points.size()-1){
+                paintMarker(painter, ps, MarkerType::last,
+                             color_array[i], color_array[i]);
+            }
+            else {
+                paintMarker(painter, ps, MarkerType::other,
+                             Qt::blue, Qt::white);
+            }
+
         }
-        //style for lines
-        //std::cout << "(color: " << color_array[i] << ") - " << "street: " << street.name << std::endl;
         painter.setPen(color_array[i]);
         painter.setBrush(color_array[i]);
         painter.drawPolyline(street_pline);
         i++;
-        if(i>3)
+        if(i>12)
             i = 0;
     }
 
@@ -127,7 +215,6 @@ void MapViewer::paintEvent(QPaintEvent *event)
     p = toPointInScreen(m_other->pos());
     pp = p-m_center;
     painter.drawEllipse(pp, 5, 5);
-    painter.setFont(QFont("Arial", 14));
     painter.drawText(QPoint(pp.x(), pp.y()-5), m_other->map_info().street_name);
 
 }

@@ -72,10 +72,18 @@
     <property name="title">
      <string>View</string>
     </property>
+    <widget class="QMenu" name="menuMarkers">
+     <property name="title">
+      <string>Markers</string>
+     </property>
+     <addaction name="actionShow_Markers_labels"/>
+     <addaction name="actionShow_Markers"/>
+    </widget>
     <addaction name="actionReset"/>
     <addaction name="actionCenter"/>
     <addaction name="actionBackground_Color"/>
     <addaction name="actionStreets_Thickness"/>
+    <addaction name="menuMarkers"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -83,7 +91,15 @@
     </property>
     <addaction name="actionMapViewer"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionEGO"/>
+    <addaction name="actionOTHER"/>
+   </widget>
    <addaction name="file_menu"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuAbout"/>
   </widget>
@@ -136,6 +152,38 @@
    </property>
    <property name="menuRole">
     <enum>QAction::QuitRole</enum>
+   </property>
+  </action>
+  <action name="actionEGO">
+   <property name="text">
+    <string>EGO</string>
+   </property>
+  </action>
+  <action name="actionOTHER">
+   <property name="text">
+    <string>OTHER</string>
+   </property>
+  </action>
+  <action name="actionShow_Markers_labels">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show Markers labels</string>
+   </property>
+  </action>
+  <action name="actionShow_Markers">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Markers</string>
    </property>
   </action>
  </widget>

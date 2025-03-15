@@ -17,7 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     the_map = new Map();
     the_ego = new Ego();
     the_other = new Ego();
-
+    the_ego_dialog = new EditRoadUser(the_ego, this);
+    the_other_dialog = new EditRoadUser(the_other, this);
     the_ego_info = new QLabel();
     ui->statusbar->addWidget(the_ego_info);
     ui->statusbar->addWidget(&the_other_info);
@@ -26,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
     the_map_viewer = new MapViewer(static_cast<QWidget *>(this),
                                    the_map, the_ego, the_other);
     QPalette palette = ui->map_area->palette();
+
+    the_ego_dialog->hide();
+    the_other_dialog->hide();
+
     the_map_viewer->setPalette(palette);
     the_map_viewer->setAutoFillBackground(true);
     the_map_viewer->repaint();
@@ -36,6 +41,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionReset, SIGNAL(triggered(bool)), this, SLOT(resetView()));
     connect(ui->actionCenter, SIGNAL(triggered(bool)), this, SLOT(centerView()));
     connect(ui->actionBackground_Color, SIGNAL(triggered(bool)), this, SLOT(changeBackGroundColor()));
+    connect(ui->actionShow_Markers, SIGNAL(toggled(bool)), this, SLOT(showMarkers(bool)));
+
+    connect(ui->actionEGO, SIGNAL(triggered(bool)), this, SLOT(editEgo()));
+    connect(ui->actionOTHER, SIGNAL(triggered(bool)), this, SLOT(editOther()));
 
     connect(the_ego, SIGNAL(updated(QPointF)), this, SLOT(egoUpdated(QPointF)));
     connect(the_ego, SIGNAL(updated(QPointF)), the_map, SLOT(matchEgoToMap(QPointF)));
@@ -97,6 +106,26 @@ void MainWindow::changeBackGroundColor()
     the_map_viewer->setPalette(palette);
 }
 
+void MainWindow::showMarkers(bool checked)
+{
+    the_map_viewer->setMarker_en(checked);
+}
+
+void MainWindow::showMarkersLabels(bool checked)
+{
+    the_map_viewer->setMarker_label_en(checked);
+}
+
+void MainWindow::editEgo()
+{
+    the_ego_dialog->show();
+}
+
+void MainWindow::editOther()
+{
+    the_other_dialog->show();
+}
+
 void MainWindow::egoUpdated(QPointF p)
 {
     // auto status_bar = ui->statusbar;
@@ -104,6 +133,8 @@ void MainWindow::egoUpdated(QPointF p)
     msg += QString::number(p.x()) + ", " + QString::number(p.y());
     // status_bar->showMessage(msg);
     the_ego_info->setText(msg);
+    if(the_map_viewer != nullptr)
+        the_map_viewer->update();
 }
 
 void MainWindow::otherUpdated(QPointF p)
@@ -113,4 +144,6 @@ void MainWindow::otherUpdated(QPointF p)
     msg += QString::number(p.x()) + ", " + QString::number(p.y());
     // status_bar->showMessage(msg);
     the_other_info.setText(msg);
+    if(the_map_viewer != nullptr)
+        the_map_viewer->update();
 }

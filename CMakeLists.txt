@@ -46,6 +46,8 @@ else()
             mapviewer.h mapviewer.cpp
             ego.h ego.cpp
             map.h map.cpp
+            editroaduser.ui
+            editroaduser.h editroaduser.cpp
         )
     endif()
 endif()

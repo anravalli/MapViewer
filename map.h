@@ -20,6 +20,7 @@ struct Street {
 struct SegmentInfo {
     QPointF relative_position;
     double lenght;
+    double bearing;
     QString street_name;
     int street_idx;
     int start_idx;

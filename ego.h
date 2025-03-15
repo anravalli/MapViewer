@@ -16,6 +16,12 @@ public:
 
     SegmentInfo map_info() const;
 
+    Ego &operator = (const Ego& other);
+
+    double heading() const;
+
+    double speed() const;
+
 public slots:
     void updateMapInfo(SegmentInfo info);
 
@@ -25,6 +31,8 @@ signals:
 private:
     QPointF m_pos;
     SegmentInfo m_map_info;
+    double m_heading;
+    double m_speed;
 };
 
 #endif // EGO_H

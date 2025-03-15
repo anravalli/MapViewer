@@ -303,6 +303,7 @@ bool Map::mapToSegment(const QPointF &point, SegmentInfo &segment)
         matched = true;
         segment.lenght = relative_end.x;
         segment.relative_position = QPointF(relative_p.x, relative_p.y);
+        segment.bearing = segment_bearing;
         std::cout << "matched: " << matched << std::endl;
     }
     return matched;
@@ -336,8 +337,10 @@ void Map::matchEgoToMap(QPointF p)
 {
     std::cout << "Matching EGO to map" << std::endl;
     SegmentInfo segment;
-    if (matchToMap(p, segment))
+    if (matchToMap(p, segment)){
+        std::cout << "Ego details: " << std::endl;
         emit matchedEgo(segment);
+    }
 }
 
 void Map::matchOtherToMap(QPointF p)
