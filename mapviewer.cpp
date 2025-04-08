@@ -1,6 +1,10 @@
 #include "mapviewer.h"
 #include "./ui_mainwindow.h"
 
+#include <QMqttClient>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 #include "map.h"
 #include "ego.h"
 
@@ -28,16 +32,33 @@ void MapViewer::reset()
 
 void MapViewer::centerView()
 {
-    centerTo(toPointInScreen(m_map->rect().center()));
+    centerTo(m_map->rect().center());
+    update();
+}
+
+void MapViewer::centerToEgo()
+{
+    if(m_ego->isValid()){
+        centerTo(m_ego->pos());
+        update();
+    }
+}
+
+void MapViewer::centerToOther()
+{
+    if(m_other->isValid()){
+        centerTo(m_other->pos());
+        update();
+    }
 }
 
 void MapViewer::centerTo(const QPointF p)
 {
-    std::cout << "m_center: " << m_center.x() << ", " << m_center.y() << std::endl;
-    std::cout << "p: " << p.x() << ", " << p.y() << std::endl;
-    m_delta = m_center-p;
-    std::cout << "New m_delta: " << m_delta.x() << ", " << m_delta.y() << std::endl;
-    update();
+    std::cout << "centering to point in map: " << p.x() << ", " << p.y() << std::endl;
+    auto ps = toPointInScreen(p);
+    std::cout << "--- converted point to screen: " << ps.x() << ", " << ps.y() << std::endl;
+    m_delta = m_center-ps;
+    std::cout << "--- new delta to apply: " << m_delta.x() << ", " << m_delta.y() << std::endl;
 }
 
 void MapViewer::paintMarker(QPainter &painter, QPointF pos,
@@ -138,9 +159,9 @@ void MapViewer::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     // std::cout << "center is at:" << m_center.x() << ", " << m_center.y() << std::endl;
-    painter.translate(m_center);
+    painter.translate(m_center+m_delta);
     // painter.translate(m_center - this->rect().center());
-    painter.translate(m_delta);
+    // painter.translate(m_delta);
 
     enum Qt::GlobalColor color_array[13] = {Qt::white,
                                            Qt::red,
@@ -221,13 +242,14 @@ void MapViewer::paintEvent(QPaintEvent *event)
 
 void MapViewer::mousePressEvent(QMouseEvent *event)
 {
+    Qt::KeyboardModifiers modifiers = event->modifiers();
     switch(event->button()){
     case Qt::LeftButton:
-        break;
-    case Qt::MiddleButton:
-        m_reference = event->pos();
-        qApp->setOverrideCursor(Qt::ClosedHandCursor);
-        m_pan_en = true;
+        if (modifiers & Qt::ControlModifier) {
+            m_reference = event->pos();
+            qApp->setOverrideCursor(Qt::ClosedHandCursor);
+            m_pan_en = true;
+        }
         break;
     default:
         break;
@@ -236,23 +258,25 @@ void MapViewer::mousePressEvent(QMouseEvent *event)
 
 void MapViewer::mouseReleaseEvent(QMouseEvent *event)
 {
+    Qt::KeyboardModifiers modifiers = event->modifiers();
     QPointF sp;
     switch(event->button()){
     case Qt::LeftButton:
-        std::cout << "L - Event x: " << event->x() << ", y: " << event->y() << std::endl;
-        sp = (event->pos()-m_delta);
-        std::cout << "event sp x: " << sp.x() << ", y: " << sp.y() << std::endl;
-        m_ego->update(toPointInMap(sp));
-
-        update();
-        break;
-    case Qt::MiddleButton:
-        qApp->restoreOverrideCursor();
-        m_pan_en = false;
-        update();
+        if (modifiers & Qt::ControlModifier) {
+            qApp->restoreOverrideCursor();
+            m_pan_en = false;
+            update();
+        }
+        else {
+            std::cout << "L - Event x: " << event->position().x() << ", y: " << event->position().y() << std::endl;
+            sp = (event->pos()-m_delta);
+            std::cout << "event sp x: " << sp.x() << ", y: " << sp.y() << std::endl;
+            m_ego->update(toPointInMap(sp));
+            update();
+        }
         break;
     case Qt::RightButton:
-        std::cout << "R - Event x: " << event->x() << ", y: " << event->y() << std::endl;
+        std::cout << "R - Event x: " << event->position().x() << ", y: " << event->position().y() << std::endl;
         sp = (event->pos()-m_delta);
         std::cout << "event sp x: " << sp.x() << ", y: " << sp.y() << std::endl;
         m_other->update(toPointInMap(sp));
@@ -286,39 +310,27 @@ void MapViewer::resizeEvent(QResizeEvent *event)
 
 void MapViewer::wheelEvent(QWheelEvent *event)
 {
-    // Ottieni la direzione della rotazione
+    qDebug() << "Ctrl Down";
 
+    QPointF tmp = event->position()-m_delta;
+    //convert the event position to a point-in-map with old zoom factor
+    tmp = toPointInMap(tmp);
 
-    // Ottieni i modificatori (Ctrl, Shift, Alt)
-    Qt::KeyboardModifiers modifiers = event->modifiers();
-    if (modifiers & Qt::ControlModifier) {
-        qDebug() << "Ctrl premuto";
-        // Accetta l'evento per evitare che venga propagato ad altri widget
-        int delta = event->angleDelta().y();
+    int delta = event->angleDelta().y();
 
-        if (delta > 0) {
-            qDebug() << "Rotellina su";
-            m_zoom = m_zoom * 2;
-        } else if (delta < 0) {
-            qDebug() << "Rotellina giù";
-            m_zoom = m_zoom / 2;
-        }
-
-        //m_delta += (event->position()-this->rect().center())*m_zoom;
-        // m_center = event->position();
-        QPointF tmp = event->position();
-        // std::cout << "position: " << tmp.x() << ", " << tmp.y() << std::endl;
-        // tmp = toPointInMap(tmp);
-        // std::cout << "position to map: "<< tmp.x() << ", " << tmp.y() << std::endl;
-        // tmp = toPointInScreen(tmp);
-        // std::cout << "position to screen: "<< tmp.x() << ", " << tmp.y() << std::endl;
-        tmp = tmp*m_zoom;
-        std::cout << "new center: "<< tmp.x() << ", " << tmp.y() << std::endl;
-        centerTo(tmp);
-        event->accept();
-        qDebug() << "new zoom factor: " << m_zoom;
-        // qDebug() << "new center is: " << m_center;
-
-        // update();
+    if (delta > 0) {
+        qDebug() << "Wheel Up";
+        m_zoom = m_zoom * 2;
+    } else if (delta < 0) {
+        qDebug() << "Wheel Down";
+        m_zoom = m_zoom / 2;
     }
+
+    event->accept();
+    qDebug() << "new zoom factor: " << m_zoom;
+
+    //center (convert to point-in-screen) with new zoom factor
+    centerTo(tmp);
+    update();
+
 }

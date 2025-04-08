@@ -15,6 +15,7 @@ void Ego::update(QPointF pos)
     std::cout << "New position (lat,lon): " << std::fixed << std::setprecision(8) << pos.y() << "," << pos.x() << std::endl;
     m_pos = pos;
     m_map_info.street_name = "";
+    m_is_valid = true;
     emit(updated(pos));
 }
 

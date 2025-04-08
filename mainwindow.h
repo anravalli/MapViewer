@@ -26,6 +26,8 @@ public slots:
     void selectMap();
     void resetView();
     void centerView();
+    void centerToEgo();
+    void centerToOther();
     void changeBackGroundColor();
     void showMarkers(bool checked);
     void showMarkersLabels(bool checked);

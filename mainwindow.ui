@@ -79,8 +79,16 @@
      <addaction name="actionShow_Markers_labels"/>
      <addaction name="actionShow_Markers"/>
     </widget>
+    <widget class="QMenu" name="menuCenter_To">
+     <property name="title">
+      <string>Center To..</string>
+     </property>
+     <addaction name="actionCenter_to_EGO"/>
+     <addaction name="actionCenter_to_OTHER"/>
+    </widget>
     <addaction name="actionReset"/>
     <addaction name="actionCenter"/>
+    <addaction name="menuCenter_To"/>
     <addaction name="actionBackground_Color"/>
     <addaction name="actionStreets_Thickness"/>
     <addaction name="menuMarkers"/>
@@ -184,6 +192,16 @@
    </property>
    <property name="text">
     <string>Show Markers</string>
+   </property>
+  </action>
+  <action name="actionCenter_to_EGO">
+   <property name="text">
+    <string>EGO</string>
+   </property>
+  </action>
+  <action name="actionCenter_to_OTHER">
+   <property name="text">
+    <string>OTHER</string>
    </property>
   </action>
  </widget>

@@ -188,18 +188,18 @@ void Map::extractStreets(const QString &osmFilePath)
     while (!xml.atEnd() && !xml.hasError()) {
         QXmlStreamReader::TokenType token = xml.readNext();
         if (token == QXmlStreamReader::StartElement) {
-            if (xml.name() == "node") {
+            if (xml.name() == QString("node")) {
                 long long id = xml.attributes().value("id").toLongLong();
                 double lon = xml.attributes().value("lon").toDouble();
                 double lat = xml.attributes().value("lat").toDouble();
                 nodes[id] = QPointF(lon, lat);
-            } else if (xml.name() == "way") {
+            } else if (xml.name() == QString("way")) {
                 Street currentWay;
 
-                while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "way")) {
+                while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == QString("way"))) {
                     xml.readNext();
                     if (xml.tokenType() == QXmlStreamReader::StartElement) {
-                        if (xml.name() == "tag") {
+                        if (xml.name() == QString("tag")) {
                             QString k = xml.attributes().value("k").toString();
                             QString v = xml.attributes().value("v").toString();
                             if (k == "name") {
@@ -208,7 +208,7 @@ void Map::extractStreets(const QString &osmFilePath)
                             } else if (k == "highway") {
                                 currentWay.type = v.toStdString();
                             }
-                        } else if (xml.name() == "nd") {
+                        } else if (xml.name() == QString("nd")) {
                             long long ref = xml.attributes().value("ref").toLongLong();
                             if (nodes.find(ref) != nodes.end())
                                 currentWay.points.push_back(nodes[ref]);
@@ -245,7 +245,7 @@ void Map::extractBounds(const QString &osmFilePath)
     while (!xml.atEnd() && !xml.hasError()) {
         QXmlStreamReader::TokenType token = xml.readNext();
         if (token == QXmlStreamReader::StartElement) {
-            if (xml.name() == "bounds") {
+            if (xml.name() == QString("bounds")) {
                 // std::cout << xml.text().toStdString() << std::endl;
                 double min_lat = xml.attributes().value("minlat").toDouble();
                 double max_lat = xml.attributes().value("maxlat").toDouble();

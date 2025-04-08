@@ -19,9 +19,10 @@ public:
     MapViewer(QWidget *_parent, Map *map, Ego *ego, Ego *other);
     void reset();
     void centerView();
+    void centerToEgo();
+    void centerToOther();
 
     void setMarker_en(bool newMarker_en);
-
     void setMarker_label_en(bool newMarker_label_en);
 
 protected:

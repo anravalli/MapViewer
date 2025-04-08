@@ -19,8 +19,11 @@ public:
     Ego &operator = (const Ego& other);
 
     double heading() const;
-
     double speed() const;
+
+    bool isValid(){
+        return m_is_valid;
+    }
 
 public slots:
     void updateMapInfo(SegmentInfo info);
@@ -29,6 +32,7 @@ signals:
     void updated(QPointF pos);
 
 private:
+    bool m_is_valid = false;
     QPointF m_pos;
     SegmentInfo m_map_info;
     double m_heading;

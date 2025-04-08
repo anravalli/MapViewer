@@ -40,8 +40,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionLoad_Map, SIGNAL(triggered(bool)), this, SLOT(selectMap()));
     connect(ui->actionReset, SIGNAL(triggered(bool)), this, SLOT(resetView()));
     connect(ui->actionCenter, SIGNAL(triggered(bool)), this, SLOT(centerView()));
+    connect(ui->actionCenter_to_EGO, SIGNAL(triggered(bool)), this, SLOT(centerToEgo()));
+    connect(ui->actionCenter_to_OTHER, SIGNAL(triggered(bool)), this, SLOT(centerToOther()));
+
     connect(ui->actionBackground_Color, SIGNAL(triggered(bool)), this, SLOT(changeBackGroundColor()));
+
     connect(ui->actionShow_Markers, SIGNAL(toggled(bool)), this, SLOT(showMarkers(bool)));
+    connect(ui->actionShow_Markers_labels, SIGNAL(toggled(bool)), this, SLOT(showMarkersLabels(bool)));
 
     connect(ui->actionEGO, SIGNAL(triggered(bool)), this, SLOT(editEgo()));
     connect(ui->actionOTHER, SIGNAL(triggered(bool)), this, SLOT(editOther()));
@@ -94,6 +99,16 @@ void MainWindow::resetView()
 void MainWindow::centerView()
 {
     the_map_viewer->centerView();
+}
+
+void MainWindow::centerToEgo()
+{
+    the_map_viewer->centerToEgo();
+}
+
+void MainWindow::centerToOther()
+{
+    the_map_viewer->centerToOther();
 }
 
 void MainWindow::changeBackGroundColor()
